@@ -1,7 +1,9 @@
 Mailgraph::Application.routes.draw do
-  root :to => 'UsersController#index'
-  devise_for :user
-  resources :users
+  devise_for :users
+  
+  #resources :users
+  root :to => 'home#index'
+  
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
