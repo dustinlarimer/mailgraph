@@ -4,6 +4,7 @@ gem 'rails', '3.2.7'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
+#gem 'haml'
 
 gem 'neo4j', '2.0.1'
 gem 'neo4j-wrapper', '~> 2.0.1'
