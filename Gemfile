@@ -13,7 +13,11 @@ gem 'neo4j-core', '~> 2.0.1'
 gem 'devise', '1.5.3'
 gem 'devise-neo4j', :git => 'git://github.com/andreasronge/devise-neo4j.git'
 
-gem 'gmail', '~> 0.4.0'
+gem 'omniauth'
+gem 'omniauth-google-oauth2'
+#gem 'omniauth-openid', :git => 'git://github.com/intridea/omniauth-openid.git'
+#gem 'gmail', :git => 'git://github.com/Yesware/gmail.git' #'~> 0.4.0'
+#gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
 
 group :development do
   gem 'rspec-rails'

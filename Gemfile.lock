@@ -62,12 +62,7 @@ GEM
       addressable (~> 2.2.4)
       multipart-post (~> 1.1.0)
       rack (>= 1.1.0, < 2)
-    gmail (0.4.0)
-      gmail_xoauth (>= 0.3.0)
-      mail (>= 2.2.1)
-      mime (>= 0.1)
-    gmail_xoauth (0.3.2)
-      oauth (>= 0.3.6)
+    hashie (1.2.0)
     hike (1.2.1)
     i18n (0.6.0)
     journey (1.0.4)
@@ -81,7 +76,6 @@ GEM
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mime (0.1)
     mime-types (1.19)
     multi_json (1.0.4)
     multi_xml (0.2.2)
@@ -112,6 +106,11 @@ GEM
     oauth2 (0.4.1)
       faraday (~> 0.6.1)
       multi_json (>= 0.0.5)
+    omniauth (1.1.0)
+      hashie (~> 1.2)
+      rack
+    omniauth-google-oauth2 (0.0.4)
+      omniauth (~> 1.0)
     orm_adapter (0.0.7)
     polyglot (0.3.3)
     rack (1.4.1)
@@ -189,13 +188,14 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   devise (= 1.5.3)
   devise-neo4j!
-  gmail (~> 0.4.0)
   jquery-rails
   jruby-openssl
   json
   neo4j (= 2.0.1)
   neo4j-core (~> 2.0.1)
   neo4j-wrapper (~> 2.0.1)
+  omniauth
+  omniauth-google-oauth2
   rails (= 3.2.7)
   rspec-rails
   sass-rails (~> 3.2.3)
