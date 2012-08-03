@@ -1,7 +1,10 @@
 Mailgraph::Application.routes.draw do
-  devise_for :users
+  match '/auth/:provider/callback' => 'authentications#create'
+  match '/authentication/:id' => 'authentications#destroy'
+  devise_for :users, :controllers => { :registrations => 'registrations' }
   
   #resources :users
+  resources :authentications
   root :to => 'home#index'
   
 

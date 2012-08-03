@@ -4,7 +4,7 @@ gem 'rails', '3.2.7'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-#gem 'haml'
+# gem 'haml'
 
 gem 'neo4j', '2.0.1'
 gem 'neo4j-wrapper', '~> 2.0.1'
@@ -13,11 +13,20 @@ gem 'neo4j-core', '~> 2.0.1'
 gem 'devise', '1.5.3'
 gem 'devise-neo4j', :git => 'git://github.com/andreasronge/devise-neo4j.git'
 
-gem 'omniauth'
-gem 'omniauth-google-oauth2'
-#gem 'omniauth-openid', :git => 'git://github.com/intridea/omniauth-openid.git'
-#gem 'gmail', :git => 'git://github.com/Yesware/gmail.git' #'~> 0.4.0'
-#gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
+# OAuth 1.0
+gem 'omniauth', '~> 1.0.0'
+gem 'omniauth-google' 
+  # Authenticates, returns consumer_key + consumer_secret
+gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
+  # Accesses user's gmail account with consumer_key + consumer_secret
+
+# OAuth 2.0
+# gem 'omniauth-oauth2'
+# gem 'omniauth-google-oauth2'
+# gem 'omniauth-openid', :git => 'git://github.com/intridea/omniauth-openid.git'
+
+# gem 'gmail', :git => 'git://github.com/Yesware/gmail.git' #'~> 0.4.0'
+# gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
 
 group :development do
   gem 'rspec-rails'
