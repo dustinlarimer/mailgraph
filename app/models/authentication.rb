@@ -1,12 +1,14 @@
 class Authentication < Neo4j::Rails::Model
-  has_one(:user).to(User)
-  accepts_id_for :user
+  has_one :user #().from(User, :authentications)
+  #accepts_id_for :user
   
-  attr_accessible :provider, :uid
-  #property :user_id, :type => Fixnum
+  attr_accessible :user_id, :provider, :uid
+  
+  property :user_id, :type => Fixnum
   property :provider, :type => String
   property :uid, :type => String
   
+  index :user_id
   index :provider
   index :uid
   

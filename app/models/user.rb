@@ -1,5 +1,5 @@
 class User < Neo4j::Rails::Model
-  has_n :authentications
+  has_n :authentications #().to(Authentication)
   has_n :friends
   
   # Include default devise modules. Others available are:
@@ -8,10 +8,12 @@ class User < Neo4j::Rails::Model
          :recoverable, :rememberable, :trackable, :validatable
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me
+  attr_accessible :id, :email, :password, :password_confirmation, :remember_me
+  
   property :email, :type => String, :unique => true
   property :name, :type => String
   
+  index :id
   index :email
   index :name
   
