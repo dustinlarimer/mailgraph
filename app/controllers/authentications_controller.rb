@@ -4,11 +4,27 @@ class AuthenticationsController < ApplicationController
   end
   
   def create
-    callback = request.env["omniauth.auth"]
-    conditions = { :provider => callback['provider'], :uid => callback['uid'] }
-    #auth = Authentication.find_by_provider_and_uid(callback['provider'], callback['uid'])
-    #auth = Authentication.find(:first, :conditions => conditions)# || Authentication.create(conditions)
-    auth = Authentication.find(:first, :conditions => conditions)
+    callback = request.env['omniauth.auth']
+    owner = User.find(:email => callback['info']['email'])
+    owner_auth = owner.outgoing(:authentications).find{|node| node[:provider] == callback['provider'] && node[:uid] == callback['uid']}
+    #render :text => owner_auth.to_yaml
+
+    if owner_auth 
+      # User exists and has already authenticated with this provider
+      flash[:notice] = "Signed in successfully."
+      sign_in_and_redirect(:user, owner)
+      
+    elsif current_user
+      render :text => 'Elsif'
+      #current_user.authentications.create!(:provider => callback['provider'], :uid => callback['uid'])
+      
+    else
+      render :text => 'Else'
+      # Create a new user
+      
+    end
+    
+    /
     if auth
       flash[:notice] = "Signed in successfully."
       sign_in_and_redirect(:user, auth.user)
@@ -27,7 +43,7 @@ class AuthenticationsController < ApplicationController
         redirect_to new_user_registration_url
       end
     end
-    
+    /
   end
   
   def destroy

@@ -10,7 +10,7 @@
 	
 	<div id="container" style="margin: 20px auto 0; width: 400px">
 		<% if user_signed_in? %>
-			Signed in as <% current_user.email %>
+			Signed in as <strong><%= current_user.email %></strong>
 			<%= link_to "Sign out", destroy_user_session_path %>
 		<% else %>
 			<%= link_to "Sign up", new_user_registration_path %> or <%= link_to "Sign in", new_user_session_path %>
@@ -21,7 +21,7 @@
 		<%= content_tag :div, msg, :id => "flash_#{name}" %>
 	<% end %>
 
-<%= yield %>
+	<%= yield %>
 
 </body>
 </html>

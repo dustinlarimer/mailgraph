@@ -1,5 +1,6 @@
 class User < Neo4j::Rails::Model
   has_n :authentications
+  has_n :friends
   
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
@@ -8,12 +9,16 @@ class User < Neo4j::Rails::Model
 
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me
+  property :email, :type => String, :unique => true
   property :name, :type => String
-  property :email, :type => String, :index => :exact
-  has_n :friends
+  
+  index :email
+  index :name
+  
+  #accepts_nested_attributes_for :authentications, :allow_destroy => true
   
   def apply_omniauth(callback)
-    self.email = callback['user_info']['email'] if email.blank?
+    self.email = callback['info']['email'] if email.blank?
     authentications.build(:provider => callback['provider'], :uid => callback['uid'])
   end
 
