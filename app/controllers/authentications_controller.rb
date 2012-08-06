@@ -19,7 +19,7 @@ class AuthenticationsController < ApplicationController
     elsif current_user
       # Create new Authentication
       Neo4j::Transaction.run do
-        new_auth = Authentication.create!(:user_id => current_user.id, :provider => callback['provider'], :uid => callback['uid'])
+        new_auth = Authentication.create!(:user_id => current_user.id, :provider => callback['provider'], :uid => callback['uid'], :token => callback['credentials']['token'], :secret => callback['credentials']['secret'])
         current_user.authentications << new_auth
         current_user.save
       end

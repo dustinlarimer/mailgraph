@@ -24,7 +24,7 @@ class User < Neo4j::Rails::Model
   def apply_omniauth(callback)
     self.email = callback['info']['email'] if email.blank?
     Neo4j::Transaction.run do
-      authentications << Authentication.create!(:provider => callback['provider'], :uid => callback['uid'])
+      authentications << Authentication.create!(:provider => callback['provider'], :uid => callback['uid'], :token => callback['credentials']['token'], :secret => callback['credentials']['secret'])
     end
   end
 
