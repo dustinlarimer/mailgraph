@@ -1,7 +1,27 @@
+#require 'openssl'
+#require 'net/https'
+require 'net/smtp'
+#require 'net/imap'
+#require 'gmail'
 require 'gmail_xoauth'
+
 class AuthenticationsController < ApplicationController
   def index
     @authentications = current_user.authentications if current_user
+    if current_user
+      test = current_user.authentications.first
+      /smtp = Net::SMTP.new('smtp.gmail.com', 587)
+      smtp.enable_starttls_auto
+      secret = {
+        :consumer_key => 'anonymous',
+        :consumer_secret => 'anonymous',
+        :token => test.token,
+        :token_secret => test.secret
+      }
+      smtp.start('gmail.com', test.uid, secret, :xoauth)
+      render :text => smtp.to_yaml
+      smtp.finish/
+    end
   end
   
   def create
@@ -10,9 +30,11 @@ class AuthenticationsController < ApplicationController
     if auth
       # Sign in with auth.user_id
       user = User.find(auth.user_id)
+      auth.token = callback['credentials']['token']
+      auth.secret = callback['credentials']['secret']
+      auth.save
       flash[:notice] = "Signed in successfully."
       sign_in_and_redirect(:user, user)
-      
     elsif current_user
       # Create new Authentication
       Neo4j::Transaction.run do
@@ -22,7 +44,6 @@ class AuthenticationsController < ApplicationController
       end
       flash[:notice] = "Authentication successful."
       redirect_to authentications_url
-      
     else
       # Register new User
       new_user = User.new

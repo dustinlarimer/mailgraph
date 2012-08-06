@@ -16,17 +16,18 @@ gem 'devise-neo4j', :git => 'git://github.com/andreasronge/devise-neo4j.git'
 # OAuth 1.0
 gem 'omniauth', '~> 1.0.0'
 gem 'omniauth-google' 
-  # Authenticates, returns consumer_key + consumer_secret
+  # Authenticates, returns token + secret
+gem 'mail', '~> 2.4.4'
+gem 'gmail', :git => 'git://github.com/Yesware/gmail.git' #'~> 0.4.0'
 gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
-  # Accesses user's gmail account with consumer_key + consumer_secret
+  # Accesses user's gmail account with token + secret
 
 # OAuth 2.0
 # gem 'omniauth-oauth2'
 # gem 'omniauth-google-oauth2'
 # gem 'omniauth-openid', :git => 'git://github.com/intridea/omniauth-openid.git'
 
-# gem 'gmail', :git => 'git://github.com/Yesware/gmail.git' #'~> 0.4.0'
-# gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
+
 
 group :development do
   gem 'rspec-rails'

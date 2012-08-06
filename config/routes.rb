@@ -1,6 +1,10 @@
 Mailgraph::Application.routes.draw do
   match '/auth/:provider/callback' => 'authentications#create'
   match '/authentication/:id' => 'authentications#destroy'
+  get '/auth/failure' do
+    flash[:notice] = params[:message] # if using sinatra-flash or rack-flash
+    redirect '/'
+  end
   devise_for :users, :controllers => { :registrations => 'registrations' }
   
   #resources :users

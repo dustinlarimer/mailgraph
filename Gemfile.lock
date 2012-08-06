@@ -1,4 +1,13 @@
 GIT
+  remote: git://github.com/Yesware/gmail.git
+  revision: 5f0586f23423a3eb3c7204c8ecd5a9a7c50d231a
+  specs:
+    gmail (0.4.0)
+      gmail_xoauth (>= 0.3.0)
+      mail (>= 2.2.1)
+      mime (>= 0.1)
+
+GIT
   remote: git://github.com/andreasronge/devise-neo4j.git
   revision: 1fa76ed31ae43b77e6ac8c04ab430202a2b59c80
   specs:
@@ -47,7 +56,6 @@ GEM
       multi_json (~> 1.0)
     addressable (2.2.8)
     arel (3.0.2)
-    bcrypt-ruby (3.0.1)
     bcrypt-ruby (3.0.1-java)
     bouncy-castle-java (1.5.0146.1)
     builder (3.0.0)
@@ -79,12 +87,12 @@ GEM
       thor (~> 0.14)
     jruby-openssl (0.7.7)
       bouncy-castle-java (>= 1.5.0146.1)
-    json (1.7.4)
     json (1.7.4-java)
     mail (2.4.4)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    mime (0.1)
     mime-types (1.19)
     multi_json (1.0.4)
     multi_xml (0.2.2)
@@ -202,10 +210,12 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   devise (= 1.5.3)
   devise-neo4j!
+  gmail!
   gmail_xoauth!
   jquery-rails
   jruby-openssl
   json
+  mail (~> 2.4.4)
   neo4j (= 2.0.1)
   neo4j-core (~> 2.0.1)
   neo4j-wrapper (~> 2.0.1)
