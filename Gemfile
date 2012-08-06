@@ -15,8 +15,9 @@ gem 'devise-neo4j', :git => 'git://github.com/andreasronge/devise-neo4j.git'
 
 # OAuth 1.0
 gem 'omniauth', '~> 1.0.0'
-gem 'omniauth-google' 
+gem 'omniauth-google'
   # Authenticates, returns token + secret
+
 gem 'mail', '~> 2.4.4'
 gem 'gmail', :git => 'git://github.com/Yesware/gmail.git' #'~> 0.4.0'
 gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git' 
