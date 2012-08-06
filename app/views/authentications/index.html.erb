@@ -1,6 +1,9 @@
 <% if @authentications %>
 	<h1>Authentications: <%= @authentications.count %></h1>
   <% unless @authentications.empty? %>
+	
+	
+	
     <p><strong>You can sign in to this account using:</strong></p>
     <div class="authentications">
       <% for authentication in @authentications %>
