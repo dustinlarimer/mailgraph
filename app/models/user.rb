@@ -1,4 +1,6 @@
 class User < Neo4j::Rails::Model
+  after_save :clean_authentications #, :if => session[:omniauth].nil?
+  
   has_n :authentications #().to(Authentication)
   has_n :friends
   
@@ -21,10 +23,20 @@ class User < Neo4j::Rails::Model
   
   def apply_omniauth(callback)
     self.email = callback['info']['email'] if email.blank?
-    authentications.build(:provider => callback['provider'], :uid => callback['uid'])
+    Neo4j::Transaction.run do
+      authentications << Authentication.create!(:provider => callback['provider'], :uid => callback['uid'])
+    end
   end
 
   def password_required?
     (authentications.empty? || !password.blank?) && super
+  end
+  
+  def clean_authentications
+    authentications.each do |auth|
+      auth.user_id = self.id
+      auth.save
+    end
+    #render :text => self.id
   end
 end
