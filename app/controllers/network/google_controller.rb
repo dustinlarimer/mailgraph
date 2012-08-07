@@ -18,12 +18,15 @@ class Network::GoogleController < ApplicationController
   end
   
   def create
+    render :text => "Analyze communications from the past 45 days"
   end
   
   def update
+    render :text => "Analyze communications since last update"
   end
   
   def destroy
+    render :text => "Destroy the whole pile"
   end
   
 end
