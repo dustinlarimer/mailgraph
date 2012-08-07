@@ -1,37 +1,6 @@
-#require 'openssl'
-#require 'net/https'
-#require 'net/smtp'
-#require 'net/imap'
-#require 'net/imap'
-#require 'oauth'
-require 'gmail'
-#require 'gmail_xoauth'
-require 'mail'
-
 class AuthenticationsController < ApplicationController
   def index
     @authentications = current_user.authentications if current_user
-    if current_user
-      test = current_user.authentications.first
-      gmail = Gmail.connect!(:xoauth, test.uid, 
-        :token           => test.token,
-        :secret          => test.secret,
-        :consumer_key    => 'anonymous',
-        :consumer_secret => 'anonymous'
-      )
-      #render :text => gmail.mailbox('[Gmail]/All Mail').count #.to_yaml #mailbox('').count
-      @mailcount = gmail.mailbox('[Gmail]/All Mail').count
-      gmail.logout
-      #Mail.defaults do
-      #  retriever_method :pop3, :address    => "pop.gmail.com",
-      #                          :port       => 995,
-      #                          :user_name  => test.uid,
-      #                          :password   => test.token,
-      #                          :enable_ssl => true
-      #end
-      #emails = Mail.find(:what => :first, :count => 10, :order => :asc)
-      #render :text => emails.length
-    end
   end
   
   def create
@@ -67,8 +36,6 @@ class AuthenticationsController < ApplicationController
         redirect_to new_user_registration_url
       end
     end
-    
-    
     
   end
   

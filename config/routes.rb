@@ -5,6 +5,9 @@ Mailgraph::Application.routes.draw do
     flash[:notice] = params[:message] # if using sinatra-flash or rack-flash
     redirect '/'
   end
+  namespace :network do
+    resources :google
+  end
   devise_for :users, :controllers => { :registrations => 'registrations' }
   
   #resources :users
