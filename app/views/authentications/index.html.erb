@@ -1,7 +1,7 @@
 <% if @authentications %>
-	<h1>Authentications: <%= @authentications.count %></h1>
+	<h1>Network channels: <%= @authentications.count %></h1>
   <% unless @authentications.empty? %>
-    <p><strong>You can sign in to this account using:</strong></p>
+    <p><strong>Synced with the following accounts:</strong></p>
     <div class="authentications">
       <% for authentication in @authentications %>
         <div class="authentication">
@@ -16,6 +16,7 @@
       <% end %>
       <div class="clear"></div>
     </div>
+	<p><small><strong>Note:</strong> You can also sign in with any of these accounts</small></p>
   <% end %>
 <% else %>
 	<h1>Authentications: 0</h1>
