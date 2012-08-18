@@ -11,8 +11,35 @@ class Network::GoogleController < ApplicationController
         :consumer_key    => 'anonymous',
         :consumer_secret => 'anonymous'
       )
-      render :text => gmail.mailbox('[Gmail]/All Mail').count
-      #@mailcount = gmail.mailbox('[Gmail]/All Mail').count
+      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-16")).each do |email|
+        from = "#{email.envelope.from[0].mailbox}@#{email.envelope.from[0].host}"
+        if from == first.uid
+          puts "From: ME!"
+        else
+          puts "From: #{from}"
+        end
+        
+        
+        to = email.envelope.to
+        #puts "Sent to #{to.count} people:"
+        to.each do |person|
+          puts "»  to: #{person.mailbox}@#{person.host}"
+        end
+        
+        cc = email.envelope.cc
+        if cc
+          #puts "CC'd #{cc.count} people:"
+          cc.each do |person|
+            puts "»  cc: #{person.mailbox}@#{person.host}"
+          end
+        end
+        puts "--------------------"
+        puts ""
+      end
+      
+      #render :text => gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-08")).first.to_yaml
+      
+      #render :text => gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-08")).count
       gmail.logout
     end
   end
