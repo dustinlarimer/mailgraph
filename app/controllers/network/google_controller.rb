@@ -11,7 +11,7 @@ class Network::GoogleController < ApplicationController
         :consumer_key    => 'anonymous',
         :consumer_secret => 'anonymous'
       )
-      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-16")).each do |email|
+      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-18")).each do |email|
         from = "#{email.envelope.from[0].mailbox}@#{email.envelope.from[0].host}"
         if from == first.uid
           puts "From: ME!"
