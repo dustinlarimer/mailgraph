@@ -2,7 +2,7 @@ class User < Neo4j::Rails::Model
   after_save :clean_authentications #, :if => session[:omniauth].nil?
   
   has_n :authentications #().to(Authentication)
-  has_n :friends
+  has_n(:contacts).to(Contact)
   
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
