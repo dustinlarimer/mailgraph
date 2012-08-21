@@ -5,66 +5,53 @@ class Network::GoogleController < ApplicationController
   def index
     if current_user && current_user.authentications.count > 0
       first = current_user.authentications.first
+      mailbox = Mailbox.find(:first, :conditions => {:user_id => current_user.id, :email => first.uid})
       gmail = Gmail.connect!(:xoauth, first.uid, 
         :token           => first.token,
         :secret          => first.secret,
         :consumer_key    => 'anonymous',
         :consumer_secret => 'anonymous'
       )
-      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-19")).each do |email|
-        from = "#{email.envelope.from[0].mailbox}@#{email.envelope.from[0].host}"
-        #if current_user.authentications.any?{ |authentication| authentication.uid == from }
-        if auth_of_current_user(from)
-          puts "From: <SELF>"
-        else
-          puts "From: #{from}"
-        end
-                
-        to = email.envelope.to
-        #puts "Sent to #{to.count} people:"
-        to.each do |person|
-          to_email = "#{person.mailbox}@#{person.host}"
-          if current_user.authentications.any?{ |authentication| authentication.uid == to_email }
-            puts "»  to: <SELF>"
-          else
-            to_contact = Contact.find_or_create_by(:email => to_email)
-            if current_user.contacts.any?{ |contact| contact == to_contact }
-              # Exists, do nothing
-              puts "»  to: #{to_contact.email}, (Exists)"
-            else
-              # Add to User
-              current_user.contacts << to_contact
-              current_user.save
-              puts "»  to: #{to_contact.email}, (New: #{current_user.contacts.count})"
-            end
-          end
-        end
+      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-14")).each do |email|
         
-        cc = email.envelope.cc
-        if cc
-          #puts "CC'd #{cc.count} people:"
-          cc.each do |person|
-            cc_email = "#{person.mailbox}@#{person.host}"
-            if current_user.authentications.any?{ |authentication| authentication.uid == cc_email }
-              puts "»  cc: <SELF>"
-            else
-              cc_contact = Contact.find_or_create_by(:email => cc_email)
-              if current_user.contacts.any?{ |contact| contact == cc_contact }
-                # Exists, do nothing
-                puts "»  cc: #{cc_contact.email}, (Exists)"
-              else
-                # Add to User
-                current_user.contacts << cc_contact
-                current_user.save
-                puts "»  cc: #{cc_contact.email}, (New: #{current_user.contacts.count})"
-              end
+        if mailbox.messages.any?{ |message| message.message_id == email.envelope.message_id }
+          puts "Message already logged! (#{mailbox.messages.count})"
+        else
+          from = "#{email.envelope.from[0].mailbox}@#{email.envelope.from[0].host}"
+          from_mailbox = Mailbox.find_or_create_by(:email => from)
+          to_mailboxes = Array.new
+          cc_mailboxes = Array.new
+
+          to = email.envelope.to
+          if to
+            to.each do |person|
+              to_email = "#{person.mailbox}@#{person.host}"
+              to_mailboxes << Mailbox.find_or_create_by(:email => to_email)
             end
-            #current_user.contacts.find_or_create_by_email('#{person.mailbox}@#{person.host}')
-            #puts "»  cc: "
           end
+        
+          cc = email.envelope.cc
+          if cc
+            cc.each do |person|
+              cc_email = "#{person.mailbox}@#{person.host}"
+              cc_mailboxes << Mailbox.find_or_create_by(:email => cc_email)
+            end
+          end
+        
+          Neo4j::Transaction.run do
+            #puts "Message_ID: #{email.envelope.message_id}"
+            new_message = mailbox.messages.build(:message_id => "#{email.envelope.message_id}", :message_datetime => "#{email.envelope.date}")
+            new_message.from = from_mailbox
+            new_message.to = to_mailboxes
+            new_message.cc = cc_mailboxes
+            new_message.save
+            puts "From: #{new_message.from.email}; To: #{new_message.to.count}; Cc: #{new_message.cc.count}"
+            puts "Messages pulled from this mailbox: #{mailbox.messages.count}"
+          end
+        
+          puts "--------------------"
+          puts ""
         end
-        puts "--------------------"
-        puts ""
       end
       
       #render :text => gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-08")).first.to_yaml

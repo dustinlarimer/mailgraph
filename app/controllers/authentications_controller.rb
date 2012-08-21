@@ -1,6 +1,14 @@
 class AuthenticationsController < ApplicationController
+  
   def index
     @authentications = current_user.authentications if current_user
+    @mailboxes = current_user.mailboxes if current_user
+    respond_to do |format|
+      format.html
+      #format.json { render :json => @mailboxes.first.messages.to_json(:include=>[:from, :to, :cc]) }
+      #format.json { render :json => @mailboxes.to_json(:include=>{:messages => {:include => [:from, :to, :cc]}}) }
+      format.json { render :json => custom_json_for(@mailboxes) }
+    end
   end
   
   def create
@@ -20,6 +28,17 @@ class AuthenticationsController < ApplicationController
       Neo4j::Transaction.run do
         new_auth = Authentication.create!(:user_id => current_user.id, :provider => callback['provider'], :uid => callback['uid'], :token => callback['credentials']['token'], :secret => callback['credentials']['secret'])
         current_user.authentications << new_auth
+        
+        #mailbox = Mailbox.find(:first, :conditions => {:email => callback['uid']})
+        mailbox = Mailbox.find_or_create_by(:email => callback['uid'])
+        if mailbox.user_id.nil? 
+          mailbox.user_id = current_user.id
+          mailbox.save
+          current_user.mailboxes << mailbox
+          #else
+          #new_mailbox = Mailbox.create!(:user_id => current_user.id, :email => callback['uid'])
+          #current_user.mailboxes << Mailbox.create!(:user_id => current_user.id, :email => callback['uid'])
+        end
         current_user.save
       end
       flash[:notice] = "Authentication successful."
@@ -45,4 +64,58 @@ class AuthenticationsController < ApplicationController
     flash[:notice] = "Successfully destroyed authentication."
     redirect_to authentications_url
   end
+  
+  private
+  def custom_json_for(value)
+    #value.to_json(:include=>{:messages => {:include => [:from, :to, :cc]}})
+    nodes = Array.new
+    links = Array.new
+    wrapper = { "nodes" => nodes, "links" => links }
+    mailboxes = value.map do |mailbox|
+      
+      ties = Array.new
+      hash = Hash.new(0)
+      
+      mailbox.messages.each do |message|
+        
+        entities = Array.new
+        from = message.from
+        to = message.to.to_ary | message.cc.to_ary
+        
+        entities.push(from).concat(to)
+        entities.each do |contact|
+          node = { :email => contact.email, :mailbox_id => contact.id.to_i, :freq => 1 }
+          if nodes.index(node).nil?
+            nodes << node
+          else
+            find_dup = nodes.detect { |el| el[:email] == contact.email }
+            find_dup[:freq] += 1
+            puts "#{find_dup[:email]} tracked #{find_dup[:freq]} times"
+          end
+        end
+        
+        from_source = nodes.detect { |el| el[:email] == from.email }
+        from_index = nodes.index(from_source)
+        to.each do |target|
+          to_source = nodes.detect { |el| el[:email] == target.email }
+          to_index = nodes.index(to_source)
+          tie = { :source => from_index, :target => to_index }
+          ties << tie
+        end
+        
+      end
+      
+      ties.each do |tie|
+        hash[tie] += 1
+      end
+      hash.each do |k, v|
+        link = { :source => k[:source], :target => k[:target].to_i, :value => v }
+        links << link
+      end
+      
+    end
+    
+    wrapper.to_json
+  end
+  
 end

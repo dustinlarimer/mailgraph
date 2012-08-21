@@ -2,6 +2,7 @@ class User < Neo4j::Rails::Model
   after_save :clean_authentications #, :if => session[:omniauth].nil?
   
   has_n :authentications #().to(Authentication)
+  has_n(:mailboxes).to(Mailbox)
   has_n(:contacts).to(Contact)
   
   # Include default devise modules. Others available are:
@@ -25,6 +26,14 @@ class User < Neo4j::Rails::Model
     self.email = callback['info']['email'] if email.blank?
     Neo4j::Transaction.run do
       authentications << Authentication.create!(:provider => callback['provider'], :uid => callback['uid'], :token => callback['credentials']['token'], :secret => callback['credentials']['secret'])
+      mailbox = Mailbox.find(:first, :conditions => {:email => callback['uid']})
+      if mailbox
+        mailbox.user_id = self.id
+        mailbox.save
+        mailboxes << mailbox
+      else
+        mailboxes << Mailbox.create!(:email => callback['uid'])
+      end
     end
   end
 
@@ -33,9 +42,13 @@ class User < Neo4j::Rails::Model
   end
   
   def clean_authentications
-    authentications.each do |auth|
-      auth.user_id = self.id
-      auth.save
+    authentications.each do |this|
+      this.user_id = self.id
+      this.save
+    end
+    mailboxes.each do |this|
+      this.user_id = self.id
+      this.save
     end
     #render :text => self.id
   end
