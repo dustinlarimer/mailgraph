@@ -12,12 +12,12 @@ class Network::GoogleController < ApplicationController
         :consumer_key    => 'anonymous',
         :consumer_secret => 'anonymous'
       )
-      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-14")).each do |email|
+      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-12")).each do |email|
         
         if mailbox.messages.any?{ |message| message.message_id == email.envelope.message_id }
-          puts "Message already logged! (#{mailbox.messages.count})"
+          puts "Message already logged! (#{mailbox.messages.count} Total)"
         else
-          from = "#{email.envelope.from[0].mailbox}@#{email.envelope.from[0].host}"
+          from = "#{email.envelope.from[0].mailbox}@#{email.envelope.from[0].host}".downcase
           from_mailbox = Mailbox.find_or_create_by(:email => from)
           to_mailboxes = Array.new
           cc_mailboxes = Array.new
@@ -25,7 +25,7 @@ class Network::GoogleController < ApplicationController
           to = email.envelope.to
           if to
             to.each do |person|
-              to_email = "#{person.mailbox}@#{person.host}"
+              to_email = "#{person.mailbox}@#{person.host}".downcase
               to_mailboxes << Mailbox.find_or_create_by(:email => to_email)
             end
           end
@@ -33,7 +33,7 @@ class Network::GoogleController < ApplicationController
           cc = email.envelope.cc
           if cc
             cc.each do |person|
-              cc_email = "#{person.mailbox}@#{person.host}"
+              cc_email = "#{person.mailbox}@#{person.host}".downcase
               cc_mailboxes << Mailbox.find_or_create_by(:email => cc_email)
             end
           end
