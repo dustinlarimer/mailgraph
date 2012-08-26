@@ -85,12 +85,12 @@ class AuthenticationsController < ApplicationController
         entities.push(from).concat(to)
         entities.each do |contact|
           node = { :email => contact.email, :mailbox_id => contact.id.to_i, :freq => 1 }
-          if nodes.index(node).nil?
-            nodes << node
-          else
+          if nodes.detect { |el| el[:email] == contact.email } #nodes.index(node).nil?
             find_dup = nodes.detect { |el| el[:email] == contact.email }
             find_dup[:freq] += 1
             puts "#{find_dup[:email]} tracked #{find_dup[:freq]} times"
+          else
+            nodes << node
           end
         end
         
@@ -100,7 +100,9 @@ class AuthenticationsController < ApplicationController
           to_source = nodes.detect { |el| el[:email] == target.email }
           to_index = nodes.index(to_source)
           tie = { :source => from_index, :target => to_index }
-          ties << tie
+          if from_source[:freq] > 1
+            ties << tie
+          end
         end
         
       end
