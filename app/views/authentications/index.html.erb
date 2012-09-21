@@ -45,13 +45,13 @@
 		
 	</style>
 	<script>
-	var width = 960,
-	height = 500;
+	var width = 1200,
+	height = 850;
 
 	var color = d3.scale.category20();
 
 	var force = d3.layout.force()
-	.gravity(.2)
+	.gravity(.1)
 	.distance(100)
 	.charge(-80)
 	.size([width, height]);
