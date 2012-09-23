@@ -1,144 +1,165 @@
 <% if @authentications %>
-	<h1>Network channels: <%= @authentications.count %></h1>
-  <% unless @authentications.empty? %>
-    <p><strong>Synced with the following accounts:</strong></p>
-    <div class="authentications">
-      <% for authentication in @authentications %>
-        <div class="authentication">
-          <strong><%= link_to authentication.provider.titleize, "/network/#{authentication.provider}/" %></strong>: 
-          Signed in as <%= authentication.uid %>
-          <%= link_to "X", authentication_path(authentication), :confirm => 'Are you sure you want to remove this authentication option?', :method => :delete, :class => "remove" %><br/>
-		  <small>
-			<strong>Token:</strong> <%= authentication.token %>; 
-			<strong>Secret:</strong> <%= authentication.secret %>
-		  </small>
-        </div>
-      <% end %>
-      <div class="clear"></div>
-    </div>
-	<p><small><strong>Note:</strong> You can also sign in with these accounts</small></p>
-  <% end %>
+	<div class="row-fluid">
+	  <div class="span4">
+		<div class="well sidebar-nav" style="position: relative; z-index: 999">
+			<h3>Network channels: <%= @authentications.count %></h3>
+			<% unless @authentications.empty? %>
+			<div class="authentications">
+				<% for authentication in @authentications %>
+				<div class="authentication">
+					<strong><%= authentication.uid %></strong>: 
+					<%= link_to 'refresh', "/network/#{authentication.provider}/" %> 
+					<%= link_to '[x]', authentication_path(authentication), :confirm => 'Are you sure you want to remove this authentication option?', :method => :delete, :class => "remove" %><br/>
+				</div>
+				<% end %>
+			</div>
+			<% end %>
+		</div>
+	  </div>
+	  <div class="span8">
+	  	<% if @mailboxes %>
+		  <% unless @mailboxes.empty? %>
+			<div id="graph"></div>
+			<style>
+				#graph {
+					height: 100%;
+					left: 0;
+					position: absolute;
+					top: 0;
+					width: 100%;
+					z-index: 0;
+				}
+				circle.node {
+					box-shadow: 0 1px 2px rgba(0,0,0,.25);
+					stroke: none;
+					/*stroke: #d7d7d7;
+					stroke-width: 1.5px;*/
+				}
+
+				line.link {
+					stroke: #d7d7d7;
+					/*stroke: #999;
+					stroke-opacity: .6;*/
+				}
+
+			</style>
+			<script>
+			$(function(){
+				function adjust(){
+					setTimeout(function() {
+						var viewport_height = $(window).height();
+						var viewport_width = $(window).width();
+						$("#graph").height(viewport_height).width(viewport_width)
+						$("#graph svg").attr('height', viewport_height).attr('width', viewport_width)
+					}, 250);
+				}
+				adjust();
+				$(window).resize(function() { adjust() });
+			})
+			var width = $('#graph').width(), height = $('#graph').height();
+			var color = d3.scale.category20();
+			var force = d3.layout.force()
+				.gravity(.2)
+				.distance(150)
+				.charge(-80)
+				.size([width, height]);
+			var svg = d3.select("#graph").append("svg")
+				.attr("width", width)
+				.attr("height", height);
+			d3.json("../network.json", function(json) {
+				force
+					.charge(function(){ return json.nodes.length * -0.9 })
+					.nodes(json.nodes)
+					.links(json.links)
+					.start();
+
+				var link = svg.selectAll("line.link")
+					.data(json.links)
+					.enter().append("line")
+					.attr("class", "link")
+					.style("stroke-width", function(d) { return 1 /*return d.value * 1.2 /*return Math.sqrt()*/; });
+
+				var node = svg.selectAll("circle.node")
+					.data(json.nodes)
+					.enter()
+					.append("circle")
+					.attr("class", "node")
+					.attr("mode", "ready")
+					.attr("r", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return 12 } else { return 7 } })
+					.style("fill", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return '#555' } else { return '#999' } })
+					.style("opacity", function(d){ return d.freq * .1 })
+					//return color(d.mailbox_id); })
+					.call(force.drag)
+					.on("mouseover", function(d){})
+					.on("mouseout", function(d){})
+					.on("click", function(d){
+						if (this.getAttribute('mode')=="ready"){
+							this.setAttribute('mode', 'active');
+							this.setAttribute('r', 20);
+						} else {
+							this.setAttribute('mode', 'ready');
+							this.setAttribute('r', 10);
+						}
+						//alert(this.getAttribute('r'));
+					});
+				node.append("title").text(function(d) { return d.email + " (" + d.freq + " instances)"; });
+				//node.append("text").text(function(d) { return d.email });
+				
+				/*function toggle(mode) {
+					return function(d) {
+						if (mode){
+							node.attr("r", function(){
+								newRadius = 20
+								this.setAttribute('r', newRadius);
+								return newRadius;
+							});
+						} else {
+							node.attr("r", function(){
+								newRadius = 7
+								this.setAttribute('r', newRadius);
+								return newRadius;
+							})
+						}
+					};
+				}*/
+
+				force.on("tick", function() {
+					link
+						.attr("x1", function(d) { return d.source.x; })
+						.attr("y1", function(d) { return d.source.y; })
+						.attr("x2", function(d) { return d.target.x; })
+						.attr("y2", function(d) { return d.target.y; });
+
+					node
+						.attr("cx", function(d) { return d.x; })
+						.attr("cy", function(d) { return d.y; });
+				});
+			});
+
+			</script>
+		    <div class="authentications" style="display: none;">
+		      <% for mailbox in @mailboxes %>
+		        <div class="authentication">
+		          <strong><%= mailbox.email %></strong> (<%= mailbox.messages.count %> messages)<br/>
+				  <ul>
+				  <% for message in mailbox.messages %>
+					<li>From: <%= message.from.email %></li>
+				  <% end %>
+				  </ul>
+		        </div>
+		      <% end %>
+		    </div>
+		  <% end %>
+		<% else %>
+			<h1>Mailboxes: 0</h1>
+		<% end %>
+	  </div>
+	</div>
+
+
+	
+  
 <% else %>
 	<h1>Authentications: 0</h1>
 	Because current_user not found :(
-<% end %>
-
-
-<% if @mailboxes %>
-	<h1>Mailboxes: <%= @mailboxes.count %></h1>
-  <% unless @mailboxes.empty? %>
-	<div id="graph"></div>
-	<!--<script type="text/javascript" src="/assets/network/d3/force/force.js"></script>-->
-	<style>
-		circle.node {
-			box-shadow: 0 1px 2px rgba(0,0,0,.25);
-			stroke: none;
-			/*stroke: #d7d7d7;
-			stroke-width: 1.5px;*/
-		}
-
-		line.link {
-			stroke: #d7d7d7;
-			/*stroke: #999;
-			stroke-opacity: .6;*/
-		}
-		
-	</style>
-	<script>
-	var width = 1200,
-	height = 850;
-
-	var color = d3.scale.category20();
-
-	var force = d3.layout.force()
-	.gravity(.1)
-	.distance(100)
-	.charge(-80)
-	.size([width, height]);
-
-	var svg = d3.select("#graph").append("svg")
-	.attr("width", width)
-	.attr("height", height);
-
-	d3.json("../network.json", function(json) {
-		force.nodes(json.nodes).links(json.links).start();
-
-		var link = svg.selectAll("line.link")
-		.data(json.links)
-		.enter().append("line")
-		.attr("class", "link")
-		.style("stroke-width", function(d) { return 1 /*return d.value * 1.2 /*return Math.sqrt()*/; });
-
-		var node = svg.selectAll("circle.node")
-		.data(json.nodes)
-		.enter()
-		.append("circle")
-		.attr("class", "node")
-		.attr("mode", "ready")
-		.attr("r", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return 12 } else { return 7 } })
-		.style("fill", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return '#555' } else { return '#999' } })
-		.style("opacity", function(d){ return d.freq * .3 })
-		//return color(d.mailbox_id); })
-		.call(force.drag)
-		.on("mouseover", function(d){})
-		.on("mouseout", function(d){})
-		.on("click", function(d){
-			if (this.getAttribute('mode')=="ready"){
-				this.setAttribute('mode', 'active');
-				this.setAttribute('r', 20);
-			} else {
-				this.setAttribute('mode', 'ready');
-				this.setAttribute('r', 10);
-			}
-			//alert(this.getAttribute('r'));
-		});
-
-		node.append("title")
-		.text(function(d) { return d.email; });
-		
-		/*function toggle(mode) {
-			return function(d) {
-				if (mode){
-					node.attr("r", function(){
-						newRadius = 20
-						this.setAttribute('r', newRadius);
-						return newRadius;
-					});
-				} else {
-					node.attr("r", function(){
-						newRadius = 7
-						this.setAttribute('r', newRadius);
-						return newRadius;
-					})
-				}
-			};
-		}*/
-
-		force.on("tick", function() {
-			link.attr("x1", function(d) { return d.source.x; })
-			.attr("y1", function(d) { return d.source.y; })
-			.attr("x2", function(d) { return d.target.x; })
-			.attr("y2", function(d) { return d.target.y; });
-
-			node.attr("cx", function(d) { return d.x; })
-			.attr("cy", function(d) { return d.y; });
-		});
-	});
-
-	</script>
-    <div class="authentications">
-      <% for mailbox in @mailboxes %>
-        <div class="authentication">
-          <strong><%= mailbox.email %></strong> (<%= mailbox.messages.count %> messages)<br/>
-		  <ul>
-		  <% for message in mailbox.messages %>
-			<li>From: <%= message.from.email %></li>
-		  <% end %>
-		  </ul>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
-<% else %>
-	<h1>Mailboxes: 0</h1>
 <% end %>

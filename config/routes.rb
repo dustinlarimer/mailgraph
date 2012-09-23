@@ -3,7 +3,7 @@ Mailgraph::Application.routes.draw do
   match '/authentication/:id' => 'authentications#destroy'
   match '/network' => 'authentications#index'
   get '/auth/failure' do
-    flash[:notice] = params[:message] # if using sinatra-flash or rack-flash
+    flash[:notice] = params[:message]
     redirect '/'
   end
   namespace :network do

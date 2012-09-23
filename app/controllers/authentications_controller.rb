@@ -76,8 +76,8 @@ class AuthenticationsController < ApplicationController
       ties = Array.new
       hash = Hash.new(0)
       
-      mailbox.messages.each do |message|
-        
+      mailbox.messages.each_with_index do |message, i|
+        #break if i == 50;
         entities = Array.new
         from = message.from
         to = message.to.to_ary | message.cc.to_ary
