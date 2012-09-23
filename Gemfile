@@ -28,7 +28,8 @@ gem 'gmail_xoauth', :git => 'git://github.com/nfo/gmail_xoauth.git'
 # gem 'omniauth-google-oauth2'
 # gem 'omniauth-openid', :git => 'git://github.com/intridea/omniauth-openid.git'
 
-
+gem "haml", "~> 3.1.7"
+gem "haml-rails"
 
 group :development do
   gem 'rspec-rails'
@@ -40,7 +41,8 @@ gem 'json'
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
+  gem 'sass-rails', '~> 3.2.3'
+  gem 'bootstrap-sass', '~> 2.1.0.0'
   gem 'coffee-rails', '~> 3.2.1'
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
