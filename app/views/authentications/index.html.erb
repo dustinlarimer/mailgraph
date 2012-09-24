@@ -2,13 +2,13 @@
 	<div class="row-fluid">
 	  <div class="span4">
 		<div class="well sidebar-nav" style="position: relative; z-index: 999">
-			<h3>Network channels: <%= @authentications.count %></h3>
+			<h4>Network channels: <%= @authentications.count %> <a class="btn" href="/auth/google"><i class="icon-plus"></i> Add</a></h4>
 			<% unless @authentications.empty? %>
 			<div class="authentications">
 				<% for authentication in @authentications %>
 				<div class="authentication">
 					<strong><%= authentication.uid %></strong>: 
-					<%= link_to 'refresh', "/network/#{authentication.provider}/" %> 
+					<%= link_to 'refresh', "/network/#{authentication.provider}/#{authentication.id}/refresh" %> 
 					<%= link_to '[x]', authentication_path(authentication), :confirm => 'Are you sure you want to remove this authentication option?', :method => :delete, :class => "remove" %><br/>
 				</div>
 				<% end %>
@@ -59,16 +59,16 @@
 			var width = $('#graph').width(), height = $('#graph').height();
 			var color = d3.scale.category20();
 			var force = d3.layout.force()
-				.gravity(.2)
+				.gravity(.05)
 				.distance(150)
-				.charge(-80)
+				.charge(-150)
 				.size([width, height]);
 			var svg = d3.select("#graph").append("svg")
 				.attr("width", width)
 				.attr("height", height);
 			d3.json("../network.json", function(json) {
 				force
-					.charge(function(){ return json.nodes.length * -0.9 })
+					.charge(function(){ return json.nodes.length * -2 })
 					.nodes(json.nodes)
 					.links(json.links)
 					.start();

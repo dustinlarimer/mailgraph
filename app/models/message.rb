@@ -6,8 +6,11 @@ class Message < Neo4j::Rails::Model
   
   attr_accessible :message_id, :message_datetime
   
-  property :message_id, :type => String
-  property :message_datetime, :type => String #DateTime
+  property :message_id, :type => String, :index => :exact
+  property :message_datetime, :type => DateTime, :index => :exact
+  property :updated_at
+  property :created_at, :index => :exact
   
-  index :message_id
+  #index :message_id
+  #index :message_datetime, :type => DateTime
 end

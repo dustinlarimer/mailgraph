@@ -3,7 +3,7 @@ class Mailbox < Neo4j::Rails::Model
   #has_one :authentication
   has_n(:messages).to(Message)
   
-  attr_accessible :user_id, :email #, :authentication_id
+  attr_accessible :user_id, :email
   
   property :user_id, :type => Fixnum
   property :email, :type => String

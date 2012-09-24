@@ -2,18 +2,28 @@ require 'gmail'
 class Network::GoogleController < ApplicationController
   before_filter :authenticate_user!
   
-  def index
+  def refresh
+    #@club = Club.find(params[:club_id])
     if current_user && current_user.authentications.count > 0
-      first = current_user.authentications.first
+      first = current_user.authentications.find(params[:google_id])
       mailbox = Mailbox.find(:first, :conditions => {:user_id => current_user.id, :email => first.uid})
+      count_messages = mailbox.messages.count
+      if count_messages > 0
+        latest_message_datetime = mailbox.messages[count_messages-1].message_datetime
+        puts "Latest message datetime: #{latest_message_datetime}"
+        puts "#{mailbox.messages[count_messages-1].from.email}"
+      else
+        latest_message_datetime = Time.now - 10.days
+        puts "First round, starting from #{latest_message_datetime}"
+      end
+      
       gmail = Gmail.connect!(:xoauth, first.uid, 
         :token           => first.token,
         :secret          => first.secret,
         :consumer_key    => 'anonymous',
         :consumer_secret => 'anonymous'
       )
-      gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-12")).each do |email|
-        
+      gmail.mailbox('[Gmail]/All Mail').find(:after => latest_message_datetime).each do |email|
         if mailbox.messages.any?{ |message| message.message_id == email.envelope.message_id }
           puts "Message already logged! (#{mailbox.messages.count} Total)"
         else
@@ -40,7 +50,9 @@ class Network::GoogleController < ApplicationController
         
           Neo4j::Transaction.run do
             #puts "Message_ID: #{email.envelope.message_id}"
-            new_message = mailbox.messages.build(:message_id => "#{email.envelope.message_id}", :message_datetime => "#{email.envelope.date}")
+            #new_message_timestamp = Time.parse(email.envelope.date)
+            puts Time.parse(email.envelope.date)
+            new_message = mailbox.messages.build(:message_id => "#{email.envelope.message_id}", :message_datetime => Time.parse(email.envelope.date))
             new_message.from = from_mailbox
             new_message.to = to_mailboxes
             new_message.cc = cc_mailboxes
@@ -58,6 +70,7 @@ class Network::GoogleController < ApplicationController
       #render :text => gmail.mailbox('[Gmail]/All Mail').find(:after => Date.parse("2012-08-08")).count
       gmail.logout
     end
+    redirect_to network_url
   end
   
   def auth_of_current_user(address)
