@@ -65,7 +65,9 @@
 					.data(json.links)
 					.enter().append("line")
 					.attr("class", "link")
-					.style("opacity", function(d){ return d.value * .2 })
+					.style("opacity", function(d){ 
+						return d.value * .2
+					})
 					.style("stroke-width", function(d) { return 1 /*return d.value * 1.2 /*return Math.sqrt()*/; });
 				
 				var node = svg.selectAll("circle.node")
@@ -94,7 +96,7 @@
 						if (d.email=='dustinlarimer@gmail.com'){ return '9000px' }
 					})
 					.style("fill", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return '#555' } else { return '#999' } })
-					.style("opacity", function(d){ return d.freq * .1 })
+					.style("opacity", function(d){ return d.freq * .05 })
 					//return color(d.mailbox_id); })
 					.call(force.drag)
 					.on("mouseover", function(d){})
