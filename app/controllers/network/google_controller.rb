@@ -3,7 +3,6 @@ class Network::GoogleController < ApplicationController
   before_filter :authenticate_user!
   
   def refresh
-    #@club = Club.find(params[:club_id])
     if current_user && current_user.authentications.count > 0
       first = current_user.authentications.find(params[:google_id])
       mailbox = Mailbox.find(:first, :conditions => {:user_id => current_user.id, :email => first.uid})

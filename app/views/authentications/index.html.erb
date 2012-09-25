@@ -59,8 +59,9 @@
 			var width = $('#graph').width(), height = $('#graph').height();
 			var color = d3.scale.category20();
 			var force = d3.layout.force()
-				.gravity(.05)
-				.distance(150)
+				//.on("tick", tick)
+				.gravity(.1)
+				.distance(100)
 				.charge(-150)
 				.size([width, height]);
 			var svg = d3.select("#graph").append("svg")
@@ -68,7 +69,7 @@
 				.attr("height", height);
 			d3.json("../network.json", function(json) {
 				force
-					.charge(function(){ return json.nodes.length * -2 })
+					.charge(function(){ return json.nodes.length * -3 })
 					.nodes(json.nodes)
 					.links(json.links)
 					.start();
