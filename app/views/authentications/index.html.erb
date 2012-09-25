@@ -44,32 +44,22 @@
 
 			</style>
 			<script>
-			$(function(){
-				function adjust(){
-					setTimeout(function() {
-						var viewport_height = $(window).height();
-						var viewport_width = $(window).width();
-						$("#graph").height(viewport_height).width(viewport_width)
-						$("#graph svg").attr('height', viewport_height).attr('width', viewport_width)
-					}, 250);
-				}
-				adjust();
-				$(window).resize(function() { adjust() });
-			})
 			var width = $('#graph').width(), height = $('#graph').height();
 			var color = d3.scale.category20();
 			var force = d3.layout.force()
-				//.on("tick", tick)
-				.gravity(.1)
-				.distance(100)
-				.charge(-150)
+				//.gravity(.125)
+				//.charge(-150)
 				.size([width, height]);
 			var svg = d3.select("#graph").append("svg")
 				.attr("width", width)
 				.attr("height", height);
 			d3.json("../network.json", function(json) {
 				force
-					.charge(function(){ return json.nodes.length * -3 })
+					.charge(function(){ return json.nodes.length * -2 })
+					.linkDistance(function(d){ 
+						console.log(d.value)
+						return 100 / d.value
+					})
 					.nodes(json.nodes)
 					.links(json.links)
 					.start();
@@ -79,7 +69,7 @@
 					.enter().append("line")
 					.attr("class", "link")
 					.style("stroke-width", function(d) { return 1 /*return d.value * 1.2 /*return Math.sqrt()*/; });
-
+				
 				var node = svg.selectAll("circle.node")
 					.data(json.nodes)
 					.enter()
@@ -130,11 +120,25 @@
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
-
 					node
 						.attr("cx", function(d) { return d.x; })
 						.attr("cy", function(d) { return d.y; });
 				});
+			});
+			
+			$(function(){
+				function adjust(){
+					setTimeout(function() {
+						var viewport_height = $(window).height();
+						var viewport_width = $(window).width();
+						$("#graph").height(viewport_height).width(viewport_width);
+						$("#graph svg").attr('height', viewport_height).attr('width', viewport_width);
+						//alert(force.size([200,200]));
+						force.size([viewport_width, viewport_height]).start();
+					}, 250);
+				}
+				adjust();
+				$(window).resize(function() { adjust() });
 			});
 
 			</script>
