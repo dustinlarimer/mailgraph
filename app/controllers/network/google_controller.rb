@@ -12,7 +12,7 @@ class Network::GoogleController < ApplicationController
         puts "Latest message datetime: #{latest_message_datetime}"
         puts "#{mailbox.messages[count_messages-1].from.email}"
       else
-        latest_message_datetime = Time.now - 10.days
+        latest_message_datetime = Time.now - 30.days
         puts "First round, starting from #{latest_message_datetime}"
       end
       
@@ -48,8 +48,6 @@ class Network::GoogleController < ApplicationController
           end
         
           Neo4j::Transaction.run do
-            #puts "Message_ID: #{email.envelope.message_id}"
-            #new_message_timestamp = Time.parse(email.envelope.date)
             puts Time.parse(email.envelope.date)
             new_message = mailbox.messages.build(:message_id => "#{email.envelope.message_id}", :message_datetime => Time.parse(email.envelope.date))
             new_message.from = from_mailbox

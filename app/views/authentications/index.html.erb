@@ -38,45 +38,61 @@
 
 				line.link {
 					stroke: #d7d7d7;
-					/*stroke: #999;
-					stroke-opacity: .6;*/
+					/*stroke-opacity: .6;*/
 				}
 
 			</style>
 			<script>
-			var width = $('#graph').width(), height = $('#graph').height();
+			var width = $('#graph').width(), height = $('#graph').height(), radius = 6;
+			
 			var color = d3.scale.category20();
 			var force = d3.layout.force()
-				//.gravity(.125)
+				//.gravity(.05)
 				//.charge(-150)
 				.size([width, height]);
 			var svg = d3.select("#graph").append("svg")
 				.attr("width", width)
 				.attr("height", height);
-			d3.json("../network.json", function(json) {
+			d3.json("network.json", function(json) {
 				force
-					.charge(function(){ return json.nodes.length * -2 })
-					.linkDistance(function(d){ 
-						console.log(d.value)
-						return 100 / d.value
-					})
+					.charge(function(d){ return json.nodes.length * -1 })
+					.linkDistance(function(d){ return 100 / d.value })
 					.nodes(json.nodes)
 					.links(json.links)
 					.start();
-
+				
 				var link = svg.selectAll("line.link")
 					.data(json.links)
 					.enter().append("line")
 					.attr("class", "link")
+					.style("opacity", function(d){ return d.value * .2 })
 					.style("stroke-width", function(d) { return 1 /*return d.value * 1.2 /*return Math.sqrt()*/; });
 				
 				var node = svg.selectAll("circle.node")
 					.data(json.nodes)
 					.enter()
 					.append("circle")
+					//.attr("fixed", true)
+					.attr("address", function(d){ return d.email })
 					.attr("class", "node")
 					.attr("mode", "ready")
-					.attr("r", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return 12 } else { return 7 } })
+					.attr("r", function(d) { 
+						if (d.freq > 0 && d.freq <= 5){
+							return 5
+						} else if (d.freq  > 5 && d.freq <= 10) {
+							return 8
+						} else if (d.freq  > 10 && d.freq <= 20) {
+							return 12
+						} else if (d.freq  > 20 && d.freq <= 50) {
+							return 15
+						} else {
+							return 20
+						}
+						//if (d.email=='dustinlarimer@gmail.com'){ return 12 } else { return 7 } 
+					})
+					.attr("cx", function(d){
+						if (d.email=='dustinlarimer@gmail.com'){ return '9000px' }
+					})
 					.style("fill", function(d) { if (d.email=='dustinlarimer@gmail.com'){ return '#555' } else { return '#999' } })
 					.style("opacity", function(d){ return d.freq * .1 })
 					//return color(d.mailbox_id); })
@@ -91,10 +107,13 @@
 							this.setAttribute('mode', 'ready');
 							this.setAttribute('r', 10);
 						}
-						//alert(this.getAttribute('r'));
+						alert(this.getAttribute('fixed'));
 					});
 				node.append("title").text(function(d) { return d.email + " (" + d.freq + " instances)"; });
-				//node.append("text").text(function(d) { return d.email });
+				/*var user = svg.select("circle.node"); //.select("[textContent=dustinlarimer@gmail.com]");
+				//var user = d3.selectAll("svg circle.node")
+				console.log(user) //.data([{x: 400, y: 400}]);*/
+				//node.append("text").text(function(d) { return d.email });*/
 				
 				/*function toggle(mode) {
 					return function(d) {
@@ -113,16 +132,18 @@
 						}
 					};
 				}*/
-
 				force.on("tick", function() {
 					link
 						.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
 						.attr("x2", function(d) { return d.target.x; })
 						.attr("y2", function(d) { return d.target.y; });
-					node
+					/*node
 						.attr("cx", function(d) { return d.x; })
-						.attr("cy", function(d) { return d.y; });
+						.attr("cy", function(d) { return d.y; });*/
+					node
+						.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+						.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
 				});
 			});
 			

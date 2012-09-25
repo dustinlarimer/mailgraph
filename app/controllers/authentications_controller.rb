@@ -100,7 +100,7 @@ class AuthenticationsController < ApplicationController
           to_source = nodes.detect { |el| el[:email] == target.email }
           to_index = nodes.index(to_source)
           tie = { :source => from_index, :target => to_index }
-          if from_source[:freq] > 1
+          if from_source[:freq] > 0
             ties << tie
           end
         end
