@@ -1,7 +1,7 @@
 <% if @authentications %>
 	<div class="row-fluid">
 	  <div class="span4">
-		<div class="well sidebar-nav" style="position: relative; z-index: 999">
+		<div class="well sidebar-nav" style="background: rgba(200, 200, 200, .2); position: relative; z-index: 999">
 			<h4>Network channels: <%= @authentications.count %> <a class="btn" href="/auth/google"><i class="icon-plus"></i> Add</a></h4>
 			<% unless @authentications.empty? %>
 			<div class="authentications">
@@ -29,21 +29,12 @@
 					width: 100%;
 					z-index: 0;
 				}
-				circle.node {
-					box-shadow: 0 1px 2px rgba(0,0,0,.25);
-					stroke: none;
-					/*stroke: #d7d7d7;
-					stroke-width: 1.5px;*/
-				}
-
-				line.link {
-					stroke: #d7d7d7;
-					/*stroke-opacity: .6;*/
-				}
+				circle.node { box-shadow: 0 1px 2px rgba(0,0,0,.25); stroke: none; }
+				line.link { stroke: #d7d7d7; }
 
 			</style>
 			<script>
-			var width = $('#graph').width(), height = $('#graph').height(), radius = 6;
+			var width = $('#graph').width(), height = $('#graph').height(), radius = 1;
 			
 			var color = d3.scale.category20();
 			var force = d3.layout.force()
@@ -112,29 +103,12 @@
 						//alert(this.getAttribute('fixed'));
 					});
 				node.append("title").text(function(d) { return d.email + " (" + d.freq + " instances)"; });
-				/*var user = svg.select("circle.node"); //.select("[textContent=dustinlarimer@gmail.com]");
-				//var user = d3.selectAll("svg circle.node")
-				console.log(user) //.data([{x: 400, y: 400}]);*/
-				//node.append("text").text(function(d) { return d.email });*/
 				
-				/*function toggle(mode) {
-					return function(d) {
-						if (mode){
-							node.attr("r", function(){
-								newRadius = 20
-								this.setAttribute('r', newRadius);
-								return newRadius;
-							});
-						} else {
-							node.attr("r", function(){
-								newRadius = 7
-								this.setAttribute('r', newRadius);
-								return newRadius;
-							})
-						}
-					};
-				}*/
+				var user = svg.select("circle.node[address='dustinlarimer@gmail.com']")
+				console.log(user.data()[0].x);
+				
 				force.on("tick", function() {
+					
 					link
 						.attr("x1", function(d) { return d.source.x; })
 						.attr("y1", function(d) { return d.source.y; })
@@ -146,6 +120,14 @@
 					node
 						.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
 						.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+
+					user.data()[0].fixed = 1;
+					user.data()[0].x = $(window).width()/2;
+					user.data()[0].y = $(window).height()/2;
+					user.data()[0].px = $(window).width()/2;
+					user.data()[0].py = $(window).height()/2;
+					user.attr("cx", $(window).width()/2);
+					user.attr("cy", $(window).height()/2);
 				});
 			});
 			
