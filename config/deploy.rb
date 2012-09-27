@@ -4,8 +4,9 @@ set :repository,  "git@github.com:dustinlarimer/mailgraph.git"
 
 set :port, 2020
 
+set :deploy_via, :copy
+set :copy_exclude, [".git", ".DS_Store"]
 set :deply_to, "/home/#{user}/public_html/#{application}"
-set(:mongrel_conf) { "#{current_path}/config/mongrel_cluster.yml" }
 
 set :scm, :git
 
@@ -13,7 +14,6 @@ role :app, application
 role :web, application
 role :db, application , :primary => true
 
-set :deploy_via, :copy
 set :runner, user
 
 default_run_options[:pty] = true
