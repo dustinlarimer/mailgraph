@@ -6,6 +6,7 @@ set :port, 2020
 
 set :deploy_via, :copy
 set :copy_exclude, [".git", ".DS_Store"]
+set :rails_env, "production"
 set :deply_to, "/home/#{user}/public_html/#{application}"
 
 set :scm, :git
