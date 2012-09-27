@@ -3,7 +3,8 @@ set :user, "me"
 set :repository,  "git@github.com:dustinlarimer/mailgraph.git"
 
 set :port, 2020
-set :deply_to, "home/#{user}/public_html/#{application}"
+
+set :deply_to, "/home/#{user}/public_html/#{application}"
 
 set :scm, :git
 
