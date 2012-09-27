@@ -29,7 +29,12 @@
 					width: 100%;
 					z-index: 0;
 				}
-				circle.node { box-shadow: 0 1px 2px rgba(0,0,0,.25); stroke: none; }
+				circle.node { 
+					-moz-box-shadow: 0px 0px 15px #0099ff;
+					-webkit-box-shadow: 0px 0px 15px #0099ff;
+					box-shadow: 0px 0px 15px #0099ff;
+					stroke: none; 
+				}
 				line.link { stroke: #d7d7d7; }
 
 			</style>
@@ -44,6 +49,28 @@
 			var svg = d3.select("#graph").append("svg")
 				.attr("width", width)
 				.attr("height", height);
+				
+			/*** SVG EFFECT :: DROPSHADOW ***/
+			var defs = svg.append("defs");
+			var filter = defs.append("filter")
+				.attr("id", "dropshadow")
+				.attr("height", "130%");
+			var feGaussianBlur = filter.append("feGaussianBlur")
+				.attr("in", "SourceAlpha")
+				.attr("stDeviation", 3);
+			var feOffset = filter.append("feOffset")
+				.attr("dx", 2)
+				.attr("dy", 2)
+				.attr("result", "offsetblur");
+			var feComponentTransfer = filter.append("feComponentTransfer");
+			var feFuncA = feComponentTransfer.append("feFuncA")
+				.attr("type", "linear")
+				.attr("slope", 0.2);
+			var feMerge = filter.append("feMerge");
+			var feMergeNode = feMerge.append("feMergeNode");
+			var feMergeNode2 = feMerge.append("feMergeNode")
+				.attr("in", "SourceGraphic");
+			
 			d3.json("network.json", function(json) {
 				force
 					.charge(function(d){ return json.nodes.length * -1 })
@@ -65,7 +92,7 @@
 					.data(json.nodes)
 					.enter()
 					.append("circle")
-					//.attr("fixed", true)
+					.attr("filter", function(d) { if (d.freq  > 10) { return "url(#dropshadow)" } })
 					.attr("address", function(d){ return d.email })
 					.attr("class", "node")
 					.attr("mode", "ready")
@@ -105,7 +132,8 @@
 				node.append("title").text(function(d) { return d.email + " (" + d.freq + " instances)"; });
 				
 				var user = svg.select("circle.node[address='dustinlarimer@gmail.com']")
-				console.log(user.data()[0].x);
+				user.data()[0].fixed = 1;
+				console.log(user);
 				
 				force.on("tick", function() {
 					
@@ -118,8 +146,8 @@
 						.attr("cx", function(d) { return d.x; })
 						.attr("cy", function(d) { return d.y; });*/
 					node
-						.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-						.attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+						.attr("cx", function(d) { return d.x /*= Math.max(radius, Math.min(width - radius, d.x));*/ })
+						.attr("cy", function(d) { return d.y /*= Math.max(radius, Math.min(height - radius, d.y));*/ });
 
 					user.data()[0].fixed = 1;
 					user.data()[0].x = $(window).width()/2;
