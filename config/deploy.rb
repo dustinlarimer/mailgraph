@@ -12,7 +12,7 @@ role :app, application
 role :web, application
 role :db, application , :primary => true
 
-set :deploy_via, :copy
+#set :deploy_via, :copy
 default_run_options[:pty] = true
 
 #role :web, "your web-server here"                          # Your HTTP server, Apache/etc
