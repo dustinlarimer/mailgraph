@@ -71,7 +71,7 @@
 			var feMergeNode2 = feMerge.append("feMergeNode")
 				.attr("in", "SourceGraphic");
 			
-			d3.json("network.json", function(json) {
+			d3.json("../network.json", function(json) {
 				force
 					.charge(function(d){ return json.nodes.length * -1 })
 					.linkDistance(function(d){ return 100 / d.value })
